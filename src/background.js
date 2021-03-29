@@ -64,7 +64,6 @@ async function getAndUpdateConfig() {
 async function migrateLocalToSync() {
   // TODO(2021/03/29): remove this after a couple weeks
   const localState = await cr.storage.local.get(null)
-  console.log('localState', localState)
   if (!localState || Object.keys(localState).length === 0)
     return
   await cr.storage.sync.set(localState)
