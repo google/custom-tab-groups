@@ -53,18 +53,27 @@ async function updateConfig({ rules, groupColors }) {
 
 async function getAndUpdateConfig() {
   const { rules, groupColors } =
-      await cr.storage.local.get(['rules', 'groupColors'])
+      await cr.storage.sync.get(['rules', 'groupColors'])
   if (!rules || !groupColors) {
-    await cr.storage.local.set({ rules: [], groupColors: [] })
+    await cr.storage.sync.set({ rules: [], groupColors: [] })
   } else {
     await updateConfig({ groupColors, rules })
   }
 }
 
-chrome.storage.local.onChanged.addListener(() => {
-  getAndUpdateConfig()
-})
-getAndUpdateConfig()
+async function migrateLocalToSync() {
+  // TODO(2021/03/29): remove this after a couple weeks
+  const localState = await cr.storage.local.get(null)
+  console.log('localState', localState)
+  if (!localState || Object.keys(localState).length === 0)
+    return
+  await cr.storage.sync.set(localState)
+  await cr.storage.local.clear()
+}
+
+migrateLocalToSync()
+    .then(getAndUpdateConfig)
+    .then(() => chrome.storage.sync.onChanged.addListener(getAndUpdateConfig))
 
 async function findGroup(tab, groupName) {
   const query = {

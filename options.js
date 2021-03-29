@@ -44,7 +44,7 @@ saveButton.addEventListener('click', async () => {
   }
 
   try {
-    await cr.storage.local.set(options)
+    await cr.storage.sync.set(options)
   } catch (e) {
     errorArea.innerText = e.message
     console.warn(e)
@@ -73,7 +73,7 @@ async function loadFromStorage() {
     groupColors: [],
     verbatimGroupColors: '',
 
-    ... await cr.storage.local.get(null)
+    ... await cr.storage.sync.get(null)
   }
 
   verbatimRules = options.verbatimRules
