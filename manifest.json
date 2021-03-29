@@ -1,0 +1,16 @@
+{
+  "name": "Custom Tab Groups",
+  "description": "Automatically sort tabs into groups based on URL",
+  "version": "0.0.3",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background-wrapper.js"
+  },
+  "action": {
+    "default_title": "Custom Tab Groups Options"
+  },
+  "permissions": [
+    "storage", "tabGroups", "tabs", "webNavigation", "windows"
+  ],
+  "options_page": "options.html"
+}
