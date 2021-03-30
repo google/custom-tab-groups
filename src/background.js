@@ -90,6 +90,8 @@ async function findGroup(tab, groupName) {
 async function putInGroup(tabId, groupName) {
   await criticalSection(async () => {
     const tab = await cr.tabs.get(tabId)
+    if (tab.pinned)
+      return
     const group = await findGroup(tab, groupName)
     if (group) {
       await cr.tabs.group({
