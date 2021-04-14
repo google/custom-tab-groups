@@ -53,7 +53,7 @@ function promisify(thisArg, f, ...args) {
   return new Promise((resolve, reject) => {
     f.apply(thisArg, [...args, (...result) => {
       if (chrome.runtime.lastError)
-        reject(new Error(chrome.runtime.lastError))
+        reject(chrome.runtime.lastError)
       else if (result.length === 0)
         resolve()
       else if (result.length === 1)
@@ -64,18 +64,32 @@ function promisify(thisArg, f, ...args) {
   })
 }
 
-function deepPromisify(obj) {
+function deepPromisify(obj, spec) {
   const result = {}
-  for (const k in obj) {
-    if (typeof obj[k] === "object")
-      result[k] = deepPromisify(obj[k])
-    else if (typeof obj[k] === "function")
-      result[k] = (...args) => promisify(obj, obj[k], ...args)
-    else
-      result[k] = obj[k]
+  for (const [k, v] of Object.entries(spec)) {
+    if (v instanceof Array) {
+      result[k] = {}
+      for (const functionName of v) {
+        result[k][functionName] =
+            (...args) => promisify(obj[k], obj[k][functionName], ...args)
+      }
+    } else if (typeof v === 'object') {
+      result[k] = deepPromisify(obj[k], v)
+    } else {
+      console.error(k, v)
+      throw new Error('invalid spec')
+    }
   }
   return result
 }
 
 // "cr" is the Promise-based version of the corresponding "chrome" API.
-const cr = deepPromisify(chrome)
+const cr = deepPromisify(chrome, {
+  runtime: ['openOptionsPage'],
+  storage: {
+    local: ['clear', 'get', 'set'],
+    sync: ['clear', 'get', 'set'],
+  },
+  tabGroups: ['query', 'update'],
+  tabs: ['get', 'group', 'query'],
+})
