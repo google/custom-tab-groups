@@ -1,8 +1,7 @@
 # Custom Tab Groups
 
 This Chrome extension lets you configure a list of URLs to automatically sort
-into (Tab
-Groups)[https://blog.google/products/chrome/manage-tabs-with-google-chrome/].
+into (Tab Groups)[https://blog.google/products/chrome/manage-tabs-with-google-chrome/].
 The configuration is entered as text, e.g.:
 
 ```
